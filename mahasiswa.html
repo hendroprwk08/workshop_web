@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta content="text/html;charset=utf-8"
+			http-equiv="Content-Type">
+		
+		<meta name="viewport" 
+			content="width=device-width, initial-scale=1.0">
+		
+		
+		<!-- milligram -->
+		<link rel="stylesheet" href="css/milligram.min.css">
+
+		<!-- Sweet Alert 2 -->
+		<link rel="stylesheet" href="css/sweetalert2.css">
+		<script src="js/sweetalert2.all.min.js"></script>		
+
+		<!-- jquery -->
+		<script src="js/jquery-3.4.1.min.js"></script>
+		
+		<!-- datatable -->
+		<link rel="stylesheet" href="css/jquery.dataTables.min.css">
+		<script src="js/jquery.dataTables.min.js"></script>		
+		
+		<style type="text/css">
+			#container{
+				position:absolute;
+				left:50%;
+				top:50%;
+				-webkit-transform:translate(-50%, -50%);
+				transform:translate(-50%, -50%);
+				width:30%;
+			}
+
+			<!-- smartphone -->
+			@media(min-width: 40.0rem){
+				#container{
+					width:100%;
+				}
+			}			
+			
+			<!-- tablet -->
+			@media(min-width: 80.0rem){
+				#container{
+					width:80%;
+				}
+			}			
+
+		</style>
+	</head>
+	<body>
+		<div id="container">
+			<div class="row">
+				<div class="column">
+					<h4>Data Mahasiswa</h4>
+					<label for="nim">NIM</label>
+					<input type="text" placeholder="Nomer Induk" id="nim"/>
+					<label for="nama">Nama Lengkap</label>
+					<input type="text" placeholder="Nama" id="nama"/>
+					<label for="alamat">Alamat</label>
+					<input type="text" placeholder="Tempat Tinggal" id="alamat"/>
+					<label for="telepon">Telepon</label>
+					<input type="text" placeholder="Kontak kamu" id="telepon"/>
+					<label for="jurusan">Jurusan</label>
+					<select id="jurusan">
+						<option value="Matematika">Matematika</option>
+						<option value="Ilmu Komputer">Ilmu Komputer</option>
+						<option value="Pendidikan">Pendidikan</option>
+					</select>
+					<button id="submit" class="button">Submit</button>
+					<button id="reset" class="button button-outline">Reset</button>
+					<p><img src="images/loader.gif" id="loader"></p>				
+				</div>
+			</div>
+		</div>
+		<script type="text/javascript">
+			$(function(){
+				var base_url = "http://localhost/workshop/";
+                $("#loader").hide();
+				
+				$("#reset").click(function(){
+					$("#nim").val("");
+					$("#nama").val("");  
+					$("#alamat").val("");
+					$("#telepon").val("");
+					$("#jurusan").val("");
+				});
+				
+				$("#submit").click(function(){
+					var nim = $("#nim").val(); //ambil nilai textbox 
+					var nama = $("#nama").val();  
+					var alamat = $("#alamat").val();
+					var telepon = $("#telepon").val();
+					var jurusan = $("#jurusan").val();
+					
+					
+					/*
+					Proses ajax untuk akses API 
+					yang kemarin kita buat
+					*/
+					
+					//cek data harus lengkap
+					if(nim.length == 0 || 
+						nama.length == 0 || 
+						alamat.length == 0 || 
+						telepon.length == 0){
+
+						//sweet alert
+						Swal.fire({
+							type:'error',
+							title:'Perhatian',
+							text:'Lengkapi formulir',
+							footer:'Sepertinya masih ada yang belum terisi'
+						});
+						
+						return; //keluar dari fungsi
+					}
+					
+					//ajax simpan data
+					var myURL = base_url +"mahasiswa.php?act=1&"+
+								"nim="+ nim +"&"+
+								"nama="+ nama +"&"+
+								"alamat="+ alamat +"&"+
+								"telepon="+ telepon +"&"+
+								"jurusan="+ jurusan;
+								
+					console.log(myURL);		
+
+					$("#loader").show();
+					
+					$.ajax({
+						url:myURL,
+						success:function(result){
+							Swal.fire({
+								type:'success',
+								title:'Berhasil',
+								text:nama +' disimpan',
+							});
+							
+							$("#loader").hide();
+						},
+						fail:function(xhr, textStatus, errorThrown){
+							Swal.fire({
+								type:'error',
+								title:textStatus,
+								text:errorThrown,
+							});
+							
+							$("#loader").hide();
+						}
+					});					
+				});
+			});
+		</script>
+	</body>
+</html>
