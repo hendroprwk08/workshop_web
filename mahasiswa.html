@@ -7,7 +7,6 @@
 		<meta name="viewport" 
 			content="width=device-width, initial-scale=1.0">
 		
-		
 		<!-- milligram -->
 		<link rel="stylesheet" href="css/milligram.min.css">
 
@@ -23,13 +22,63 @@
 		<script src="js/jquery.dataTables.min.js"></script>		
 		
 		<style type="text/css">
-			#container{
+			body{
+				margin:0px;
+				padding:0px;
+			}
+			
+			#form-input{
 				position:absolute;
 				left:50%;
 				top:50%;
 				-webkit-transform:translate(-50%, -50%);
 				transform:translate(-50%, -50%);
 				width:30%;
+			}
+			
+			#table-data{
+				position:absolute;
+				left:50%;
+				top:50%;
+				-webkit-transform:translate(-50%, -50%);
+				transform:translate(-50%, -50%);
+				width:80%;
+			}
+			
+			.navbar {
+				width:100%;
+				padding: 0 20px;
+				margin-bottom: 10px;
+				background-color: #606c76;
+			}
+
+			.navbar .active{				
+				background-color: #ab5dda;
+			}
+			
+			.navbar ul {
+				list-style-type: none;
+				margin: 0;
+				padding: 0;
+				overflow: hidden;
+				background-color: #606c76;
+			}
+
+			.navbar li {
+				float: left;
+				margin-bottom: 0;
+			}
+
+			.navbar li a {
+				display: block;
+				color: white;
+				text-align: center;
+				padding: 14px 16px;
+				text-decoration: none;
+			}
+
+			.navbar li a:hover {
+				background-color: #ab5dda;
 			}
 
 			<!-- smartphone -->
@@ -49,7 +98,14 @@
 		</style>
 	</head>
 	<body>
-		<div id="container">
+		<div class='navbar'>
+			<ul>
+			  <li><a class="active" href="./mahasiswa.html">Mahasiswa</a></li>
+			  <li><a href="./pengguna.html">Pengguna</a></li>
+			  <li><a href="./logout.php">Logout</a></li>
+			</ul>
+		</div>
+		<div id="form-input">		
 			<div class="row">
 				<div class="column">
 					<h4>Data Mahasiswa</h4>
@@ -69,14 +125,128 @@
 					</select>
 					<button id="submit" class="button">Submit</button>
 					<button id="reset" class="button button-outline">Reset</button>
+					<button id="tutup" class="button button-clear">Tutup</button>
 					<p><img src="images/loader.gif" id="loader"></p>				
 				</div>
+			</div>
+		</div>
+		<div id="table-data">
+			<div class="row">
+				<button id="tambah" class="button button-outline">Tambah</button>
+				<p><img src="images/loader.gif" id="loader-table"></p>
+			</div>
+			<div class="row">
+				<table>
+					<thead>
+						<th>NIM</th>
+						<th>Nama</th>
+						<th>Alamat</th>
+						<th>Telepon</th>
+						<th>Jurusan</th>
+						<th>&nbsp;</th>
+					</thead>
+					<tbody></tbody>
+				</table>
 			</div>
 		</div>
 		<script type="text/javascript">
 			$(function(){
 				var base_url = "http://localhost/workshop/";
-                $("#loader").hide();
+                var table; //penampung datatable
+				var tempNIM = null; //temporay NIM
+				
+				$("#loader").hide();
+				$("#loader-table").hide(); 
+				$("#form-input").hide();
+				
+				loadGrid();
+				
+				function loadGrid(){
+					var myURL = base_url +"mahasiswa.php?act=4";
+
+					$("#loader-table").show();
+					 
+					$.ajax({
+						url:myURL,
+						dataType:'json',
+						success:function(result){
+							var jsonku = result[0].result;
+							console.log(jsonku);
+							
+							//DATATABLE
+							table =
+							$("table").DataTable({
+								"language":{
+									"emptyTable":"Tak ada Data"
+								},
+								data:jsonku, //dipake sama datatable
+								columns:[
+									{data:"nim"},
+									{data:"nama"},
+									{data:"alamat"},
+									{data:"telepon"},
+									{data:"jurusan"},
+									{
+										data:null,
+										"bSortable":false,
+										"mRender": function(data){
+											var view = "<a href='#' id='"+ data.nim +"' class='ubah'>Ubah</a>&nbsp;&nbsp;<a href='#' id='"+ data.nim +"' class='hapus'>Hapus</a>";
+											return view;
+										}
+									},
+								]
+							});							
+							
+							$("#loader-table").hide();
+						},
+						fail:function(xhr, textStatus, errorThrown){
+							Swal.fire({
+								type:'error',
+								title:textStatus,
+								text:errorThrown,
+							});
+							
+							$("#loader-table").hide();
+						}
+					});				
+				}
+				
+				//tangkap aksi ubah dan hapus
+				$("table tbody").on("click","a", function(){
+					var data = table.row($(this).parents("tr")).data();
+					var jenis = $(this).attr("class");
+					
+					if (jenis == "ubah"){
+						tempNIM = data['nim'];
+						$("#nim").val(tempNIM);
+						$("#nama").val(data['nama']);
+						$("#alamat").val(data['alamat']);
+						$("#telepon").val(data['telepon']);
+						$("#jurusan").val(data['jurusan']);
+						
+						$("#form-input").show();
+						$("#table-data").hide();
+						
+						$("#nim").attr("disabled", true); //kunci						
+					}else{
+						//hapus
+						var myURL = base_url +"mahasiswa.php?act=3&nim="+ data['nim'];
+
+						$("#loader-table").show();
+						 
+						$.ajax({
+							url:myURL,
+							dataType:'json',
+							success:function(result){
+								Swal.fire("Konfirmasi", "Berhasil dihapus", "success");
+								
+								//reset data table dan muat ulang
+								$('table').DataTable().clear().destroy();
+								loadGrid();
+							}		
+						});
+					}
+				});
 				
 				$("#reset").click(function(){
 					$("#nim").val("");
@@ -86,6 +256,21 @@
 					$("#jurusan").val("");
 				});
 				
+				$("#tutup").click(function(){
+					$("#form-input").hide();
+					$("#table-data").show();
+					$("table").DataTable().clear().destroy();
+					loadGrid();
+				});
+				
+				$("#tambah").click(function(){
+					$("#form-input").show();
+					$("#table-data").hide();
+					tempNIM = null;
+					$("#nim").attr("disabled", false);
+					$("#reset").click();			
+				});
+				
 				$("#submit").click(function(){
 					var nim = $("#nim").val(); //ambil nilai textbox 
 					var nama = $("#nama").val();  
@@ -93,11 +278,7 @@
 					var telepon = $("#telepon").val();
 					var jurusan = $("#jurusan").val();
 					
-					
-					/*
-					Proses ajax untuk akses API 
-					yang kemarin kita buat
-					*/
+					// Proses ajax untuk akses API yang kemarin kita buat
 					
 					//cek data harus lengkap
 					if(nim.length == 0 || 
@@ -117,16 +298,28 @@
 					}
 					
 					//ajax simpan data
-					var myURL = base_url +"mahasiswa.php?act=1&"+
+					var myURL;
+					console.log(tempNIM);
+					if (tempNIM == null){
+						myURL = base_url +"mahasiswa.php?act=1&"+
 								"nim="+ nim +"&"+
 								"nama="+ nama +"&"+
 								"alamat="+ alamat +"&"+
 								"telepon="+ telepon +"&"+
 								"jurusan="+ jurusan;
+					}else{
+						myURL = base_url +"mahasiswa.php?act=2&"+
+								"nim="+ tempNIM +"&"+
+								"nama="+ nama +"&"+
+								"alamat="+ alamat +"&"+
+								"telepon="+ telepon +"&"+
+								"jurusan="+ jurusan;
 								
-					console.log(myURL);		
+						tempNIM = null;
+					}				
 
 					$("#loader").show();
+					console.log(myURL);
 					
 					$.ajax({
 						url:myURL,
@@ -138,6 +331,12 @@
 							});
 							
 							$("#loader").hide();
+							
+							$("#form-input").hide();
+							$("#table-data").show();
+							
+							$("table").DataTable().clear().destroy();
+							loadGrid();
 						},
 						fail:function(xhr, textStatus, errorThrown){
 							Swal.fire({
@@ -151,6 +350,7 @@
 					});					
 				});
 			});
+			
 		</script>
 	</body>
 </html>
