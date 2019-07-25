@@ -25,10 +25,13 @@ if ($action == null){
 	$res = $d->get($sql);
 	
 	//apakah ada data?
-	if ($res[0]['username'] != "" && $res[0]['nama'] != ""){
+	if(!empty($res)){
 		//daftarkan session pada sisi server (PHP)
 		$_SESSION["usr"] = $res[0]['username'];
 		$_SESSION["nm"] = $res[0]['nama'];	
+		
+		//arahkan ke mahasiswa.php
+		//header("location: mahasiswa.php");
 	}
 	
 	$resArr[] = array("result" => $res);

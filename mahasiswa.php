@@ -1,5 +1,6 @@
 <?php
 include "database.php"; //sisipkan
+session_start();
 
 $action = null;
 
@@ -15,8 +16,18 @@ $d->open();
 $resArr = array();
 
 if($action == null){
+	/* PATH INFO
+	$x = pathinfo($_SERVER['HTTP_HOST'].$_SERVER['PHP_SELF']);
+	
+	if (!isset($_SESSION["usr"]) && !isset($_SESSION["nm"])){
+		header("location: login.html");
+	}else{
+		header("location: mahasiswa.html");
+	}
+	*/	
+
 	$resArr[] = array("result" => "0");
-	print json_encode($resArr);
+	print json_encode($resArr);	
 }elseif($action == "1"){ //input data
 	$sql = "insert into mahasiswa (nim, nama, alamat,
 			telepon, jurusan) values ('". $_REQUEST["nim"]."',
@@ -56,7 +67,4 @@ if($action == null){
 	$resArr[] = array("result" => $d->get($sql));
 	print json_encode($resArr);
 }
-
-
-
 ?>

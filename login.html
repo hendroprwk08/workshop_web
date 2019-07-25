@@ -17,23 +17,17 @@
 		<!-- jquery -->
 		<script src="js/jquery-3.4.1.min.js"></script>
 		
+		<!-- jquery cookie-->
+		<script src="js/jquery.cookie.js"></script>
+		
 		<!-- datatable -->
 		<link rel="stylesheet" href="css/jquery.dataTables.min.css">
 		<script src="js/jquery.dataTables.min.js"></script>		
 		
-		<style type="text/css">
-			#container{
-				position:absolute;
-				left:50%;
-				top:50%;
-				-webkit-transform:translate(-50%, -50%);
-				transform:translate(-50%, -50%);
-				width:30%;
-			}
-		</style>
+		<link rel="stylesheet" href="css/style.css">		
 	</head>
 	<body>
-		<div id="container">
+		<div id="form-input">
 			<div class="row">
 				<div class="column">
 					<h4>LOGIN</h4>
@@ -49,7 +43,7 @@
 		</div>
 		<script type="text/javascript">
 			$(function(){
-				var base_url = "http://localhost/workshop/";
+				var base_url = "http://localhost/workshop_web/";
                 $("#loader").hide();
 				
 				$("#reset").click(function(){
@@ -107,11 +101,15 @@
 									type:'error',
 									title:'Perhatian',
 									text:'Data tak ditemukan',
-								});
-							
-								return;
+								});							
 							}else{
-								console.log("berhasil");
+								
+								$.cookie('us', us, { expires: 1 });
+								$.cookie('nm', nm, { expires: 1 });
+								
+								//redirect ke mahasiswa.html
+								var url = base_url + "mahasiswa.html";    
+								$(location).attr('href',url);	
 							}
 							
 							$("#loader").hide();
