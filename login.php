@@ -21,20 +21,8 @@ if ($action == null){
 }elseif($action == "1"){
     $sql = "select * from pengguna where username = '". $_REQUEST['username'] ."' and "
             ."password = '". md5($_REQUEST['password'])."'";
-			
-	$res = $d->get($sql);
 	
-	//apakah ada data?
-	if(!empty($res)){
-		//daftarkan session pada sisi server (PHP)
-		$_SESSION["usr"] = $res[0]['username'];
-		$_SESSION["nm"] = $res[0]['nama'];	
-		
-		//arahkan ke mahasiswa.php
-		//header("location: mahasiswa.php");
-	}
-	
-	$resArr[] = array("result" => $res);
+	$resArr[] = array("result" => $d->get($sql));
 	print json_encode($resArr);
 }
 ?>

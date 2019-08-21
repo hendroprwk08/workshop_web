@@ -96,18 +96,17 @@
 			$("#form-input").hide();
 			
 			checkCookie();
-			loadGrid();
+			loadGrid(); //<-------- ga usah (udah ada)
 			
 			function checkCookie(){
 				var us = $.cookie('us');
 				var nm = $.cookie('nm');		
 				
-				//console.log ("cookie: "+ us + " "+ nm);
 				if (!!$.cookie('us') && !!$.cookie('nm')) {
-					// have cookie
+					// jika cookie terdaftar
 					 $("#page").fadeIn("fast");
 				} else {
-					//redirect ke login.html
+					//jika tidk, maka buka login.html
 					var url = base_url + "login.html";    
 					$(location).attr('href',url);
 				}
@@ -311,7 +310,6 @@
 			
 			$(".navbar li a").click(function(){
 				var val = $(this).text();
-				alert(val);
 				
 				if (val == "Logout"){
 					$.removeCookie('us'); // => true

@@ -38,7 +38,6 @@ if ($action == null){
 	
 	$d->execute($sql);
 
-    
     $resArr[] = array("result" => "data updated");
 	print json_encode($resArr);
 }elseif($action == "3"){
