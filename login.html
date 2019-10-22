@@ -86,7 +86,7 @@
 							//baca hasil lemparan api
 							console.log(result);
 							
-							var us = "", nm = "", json = result[0].result; //ambil object "hasil"
+							var us = "", nm = "", st = "", json = result[0].result; //ambil object "hasil"
                             console.log(json);
                             
                             // ambil nilai dari json
@@ -94,6 +94,7 @@
                                  console.log(key + " " + val.username + " " + val.nama );
 								 us = val.username;
 								 nm = val.nama;
+								 st = val.type;
                             });
 							
 							if (us.length == 0 || nm.length == 0 ){							
@@ -106,6 +107,7 @@
 								
 								$.cookie('us', us, { expires: 1 });
 								$.cookie('nm', nm, { expires: 1 });
+								$.cookie('ty', ty, { expires: 1 });
 								
 								//redirect ke mahasiswa.html
 								var url = base_url + "mahasiswa.html";    
